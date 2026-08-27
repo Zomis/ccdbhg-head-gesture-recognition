@@ -92,7 +92,7 @@ def main(args):
         cv2.putText(
             frame,
             f"FPS {int(fps)} ",
-            (1650, 60),
+            (450, 60),
             cv2.FONT_HERSHEY_SIMPLEX,
             2,
             (0, 255, 0),
