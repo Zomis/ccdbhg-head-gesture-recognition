@@ -84,6 +84,7 @@ def main(args):
 
         # Draw the output
         frame = visualizer.process(frame, face_tracker, output_track)
+        print(output_track)
 
         # Draw real time fps
         end = time.time()
