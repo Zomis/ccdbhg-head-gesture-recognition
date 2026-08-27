@@ -38,14 +38,30 @@ def main(args):
         draw_head_gesture=args.draw_head_gesture,
     )
 
-    vid = cv2.VideoCapture(0)
+    if args.file:
+        vid = cv2.VideoCapture(args.file)
+    else:
+        vid = cv2.VideoCapture(0)
+
+    FPS = 30
+    i = 0
+
     while True:
         # Capture the video frame
         # by frame
         start = time.time()
         ret, frame = vid.read()
 
-        frame_time = int(round(time.time() * 1000))
+        if not ret or frame is None:
+            print("End of video.")
+            break
+
+        frame_time = int(round((i / FPS) * 1000))
+
+        if not args.file:
+            frame_time = int(round(time.time() * 1000))
+
+        i = i + 1
 
         # Detect faces
         detection = face_detector.process_image(frame)
@@ -100,6 +116,12 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run demo")
+    parser.add_argument(
+        "--file",
+        type=str,
+        help="File to process, leave empty to use webcam",
+        required=False,
+    )
     parser.add_argument(
         "--face_detector",
         type=str,
