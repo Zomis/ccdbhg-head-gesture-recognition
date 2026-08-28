@@ -80,7 +80,15 @@ def main(args):
             )
             face_tracker.tracks_store[track][-1].add_prediction(face_prediction)
 
-        output_track = hg_predictor.process(face_tracker, track_id)
+        try:
+            output_track = hg_predictor.process(face_tracker, track_id)
+        except ValueError as e:
+            print(e)
+            if str(e) == "Segement is too short":
+                print("Segement too short, continue")
+                continue
+            raise
+
         track_handler.add_track_prediction(output_track)
 
         # Draw the output
