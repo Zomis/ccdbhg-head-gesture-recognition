@@ -37,18 +37,20 @@ def main(args):
         draw_landmarks=args.draw_landmarks,
         draw_head_gesture=args.draw_head_gesture,
     )
+    face_ids = {}
 
     if args.file:
         vid = cv2.VideoCapture(args.file)
     else:
         vid = cv2.VideoCapture(0)
 
-    FPS = 30
-    i = 0
+    FPS = args.fps
+    i = -1
 
     while True:
-        # Capture the video frame
-        # by frame
+        i = i + 1
+
+        # Capture the video frame by frame
         start = time.time()
         ret, frame = vid.read()
 
@@ -60,8 +62,6 @@ def main(args):
 
         if not args.file:
             frame_time = int(round(time.time() * 1000))
-
-        i = i + 1
 
         # Detect faces
         detection = face_detector.process_image(frame)
@@ -84,7 +84,16 @@ def main(args):
 
         # Draw the output
         frame = visualizer.process(frame, face_tracker, output_track)
-        print(output_track)
+
+        # print(output_track)
+        for track in output_track:
+            if not track in face_ids:
+                face_ids[track] = len(face_ids)
+            output_data = output_track[track]
+            print(f"{i},{frame_time},{face_ids[track]},{output_data['head_gesture']},{output_data['confidence']},{output_data['timestamp']}")
+
+        if not output_track:
+            print(f"{i},{frame_time},-1,no_face,not_available,not_available")
 
         # Draw real time fps
         end = time.time()
@@ -129,6 +138,12 @@ if __name__ == "__main__":
         default="CV2",
         help="Face detector CV2 is faster but less accurate if face more than 2m away",
         choices=["YUNET", "CV2"],
+    )
+    parser.add_argument(
+        "--fps",
+        type=int,
+        default=30,
+        help="Frames per second (defaults to 30) (only used when file is set)",
     )
     parser.add_argument(
         "--draw_bbox",
