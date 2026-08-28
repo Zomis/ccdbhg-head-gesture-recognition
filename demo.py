@@ -58,7 +58,8 @@ def main(args):
             print("End of video.")
             break
 
-        frame_time = int(round((i / FPS) * 1000))
+        frame_time = vid.get(cv2.CAP_PROP_POS_MSEC)
+        #frame_time = int(round((i / FPS) * 1000))
 
         if not args.file:
             frame_time = int(round(time.time() * 1000))
