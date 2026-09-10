@@ -531,12 +531,17 @@ class HGPredictor:
 
             for i in range(len(ids_valid)):
                 track_id = ids_valid[i]
-                idx_pred = probs.detach().cpu()[i].argmax()
-                confidence = probs.detach().cpu()[i][idx_pred]
+                track_probs = probs.detach().cpu()[i]
+                idx_pred = track_probs.argmax()
+                confidence = float(track_probs[idx_pred])
                 gesture = self.predictor.label_name[idx_pred]
                 out_track[track_id] = {
                     "head_gesture": gesture,
                     "confidence": confidence,
+                    "probabilities": {
+                        label: float(probability)
+                        for label, probability in zip(self.predictor.label_name, track_probs)
+                    },
                     "timestamp": process_track[track_id]["timestamp"],
                 }
 
@@ -544,7 +549,8 @@ class HGPredictor:
             track_id = ids_none[i]
             out_track[track_id] = {
                 "head_gesture": "none",
-                "confidence": 1,
+                "confidence": 1.0,
+                "probabilities": None,
                 "timestamp": process_track[track_id]["timestamp"],
             }
 

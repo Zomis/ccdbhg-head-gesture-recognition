@@ -21,6 +21,8 @@ from src.utils_demo import (
 
 
 def main(args):
+    gesture_labels = ["none", "nod", "shake", "tilt", "turn", "up/down"]
+
     # Instantiate
     if args.face_detector == "YUNET":
         face_detector = FaceDetectorYUNET()
@@ -49,6 +51,21 @@ def main(args):
 
     if args.startat > 0:
         vid.set(cv2.CAP_PROP_POS_MSEC, args.startat)
+
+    probability_headers = [f"prob_{label.replace('/', '_')}" for label in gesture_labels]
+    print(
+        ",".join(
+            [
+                "frame",
+                "frame_time",
+                "face_id",
+                "head_gesture",
+                "confidence",
+                "prediction_timestamp",
+                *probability_headers,
+            ]
+        )
+    )
 
     while True:
         i = i + 1
@@ -102,10 +119,24 @@ def main(args):
             if not track in face_ids:
                 face_ids[track] = len(face_ids)
             output_data = output_track[track]
-            print(f"{i},{frame_time},{face_ids[track]},{output_data['head_gesture']},{output_data['confidence']},{output_data['timestamp']}")
+            if output_data["probabilities"] is None:
+                probability_values = ["not_available"] * len(gesture_labels)
+            else:
+                probability_values = [
+                    f"{output_data['probabilities'][label]:.6f}" for label in gesture_labels
+                ]
+            print(
+                f"{i},{frame_time},{face_ids[track]},"
+                f"{output_data['head_gesture']},{output_data['confidence']:.6f},"
+                f"{output_data['timestamp']},{','.join(probability_values)}"
+            )
 
         if not output_track:
-            print(f"{i},{frame_time},-1,no_face,not_available,not_available")
+            unavailable_probabilities = ",".join(["not_available"] * len(gesture_labels))
+            print(
+                f"{i},{frame_time},-1,no_face,not_available,not_available,"
+                f"{unavailable_probabilities}"
+            )
 
         # Draw real time fps
         end = time.time()
