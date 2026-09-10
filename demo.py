@@ -47,6 +47,9 @@ def main(args):
     FPS = args.fps
     i = -1
 
+    if args.startat > 0:
+        vid.set(cv2.CAP_PROP_POS_MSEC, args.startat)
+
     while True:
         i = i + 1
 
@@ -147,6 +150,12 @@ if __name__ == "__main__":
         default="CV2",
         help="Face detector CV2 is faster but less accurate if face more than 2m away",
         choices=["YUNET", "CV2"],
+    )
+    parser.add_argument(
+        "--startat",
+        type=int,
+        default=0,
+        help="Time in milliseconds to start in the video (only when using file)",
     )
     parser.add_argument(
         "--fps",
