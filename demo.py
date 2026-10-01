@@ -104,6 +104,8 @@ def main(args):
             output_track = hg_predictor.process(face_tracker, track_id)
         except ValueError as e:
             print(e)
+            if cv2.waitKey(1) & 0xFF == ord("q"):
+                break
             if str(e) == "Segement is too short":
                 print("Segement too short, continue")
                 continue
