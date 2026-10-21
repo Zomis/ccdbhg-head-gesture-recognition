@@ -66,6 +66,8 @@ def main(args):
             ]
         )
     )
+    input_fps = FPS
+    target_fps = 30
 
     while True:
         i = i + 1
@@ -80,6 +82,14 @@ def main(args):
 
         frame_time = vid.get(cv2.CAP_PROP_POS_MSEC)
         #frame_time = int(round((i / FPS) * 1000))
+
+        should_process = (
+            int(i * target_fps / input_fps)
+            != int((i - 1) * target_fps / input_fps)
+        )
+
+        if not should_process:
+            continue
 
         if not args.file:
             frame_time = int(round(time.time() * 1000))
