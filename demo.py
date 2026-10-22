@@ -145,7 +145,7 @@ def main(args):
         for track in output_track:
             if not track in face_ids:
                 face_ids[track] = len(face_ids)
-            face = face_tracker.tracks_store[track_id][-1]
+            face = face_tracker.tracks_store[track][-1]
 
             output_data = output_track[track]
             if output_data["probabilities"] is None:
