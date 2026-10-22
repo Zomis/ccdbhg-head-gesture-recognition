@@ -171,30 +171,31 @@ def main(args):
         # Draw real time fps
         end = time.time()
         fps = 1 / (end - start)
-        cv2.putText(
-            frame,
-            f"FPS {int(fps)} ",
-            (450, 60),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            2,
-            (0, 255, 0),
-            2,
-            cv2.LINE_AA,
-        )
+        if args.view:
+            cv2.putText(
+                frame,
+                f"FPS {int(fps)} ",
+                (450, 60),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                2,
+                (0, 255, 0),
+                2,
+                cv2.LINE_AA,
+            )
+            # Display the resulting frame
+            cv2.imshow("frame", frame)
 
-        # Display the resulting frame
-        cv2.imshow("frame", frame)
-
-        # the 'q' button is set as the
-        # quitting button you may use any
-        # desired button of your choice
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
+            # the 'q' button is set as the
+            # quitting button you may use any
+            # desired button of your choice
+            if cv2.waitKey(1) & 0xFF == ord("q"):
+                break
 
     # After the loop release the cap object
     vid.release()
-    # Destroy all the windows
-    cv2.destroyAllWindows()
+    if args.view:
+        # Destroy all the windows
+        cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
@@ -223,6 +224,12 @@ if __name__ == "__main__":
         type=int,
         default=30,
         help="Frames per second (defaults to 30) (only used when file is set)",
+    )
+    parser.add_argument(
+        "--view",
+        action="store_true",
+        default=False,
+        help="Show GUI",
     )
     parser.add_argument(
         "--draw_bbox",
