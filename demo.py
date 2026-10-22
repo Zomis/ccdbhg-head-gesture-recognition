@@ -6,6 +6,7 @@
 
 import argparse
 import time
+import numpy as np
 
 import cv2
 
@@ -19,6 +20,19 @@ from src.utils_demo import (
     Visualizer,
 )
 
+def bounding_box(face):
+    bbox = face.loc
+    return f"{bbox.x1},{bbox.y1},{bbox.x2},{bbox.y2}"
+
+def face_landmarks(face):
+    # Five facial landmarks
+    if "ldmks" in face.prediction:
+        landmarks = np.array(face.prediction["ldmks"]).reshape(-1, 3)
+        s = ""
+        for i, (x, y, z) in enumerate(landmarks):
+            s = s + f",{x:.1f},{y:.1f},{z:.1f}"
+        return s[1:]
+    return "no_landmarks"
 
 def main(args):
     gesture_labels = ["none", "nod", "shake", "tilt", "turn", "up/down"]
@@ -63,6 +77,7 @@ def main(args):
                 "confidence",
                 "prediction_timestamp",
                 *probability_headers,
+                "x_start,y_start,x_end,y_end",
             ]
         )
     )
@@ -130,6 +145,8 @@ def main(args):
         for track in output_track:
             if not track in face_ids:
                 face_ids[track] = len(face_ids)
+            face = face_tracker.tracks_store[track_id][-1]
+
             output_data = output_track[track]
             if output_data["probabilities"] is None:
                 probability_values = ["not_available"] * len(gesture_labels)
@@ -140,7 +157,8 @@ def main(args):
             print(
                 f"{i},{frame_time},{face_ids[track]},"
                 f"{output_data['head_gesture']},{output_data['confidence']:.6f},"
-                f"{output_data['timestamp']},{','.join(probability_values)}"
+                f"{output_data['timestamp']},{','.join(probability_values)},"
+                f"{bounding_box(face)}"
             )
 
         if not output_track:
