@@ -104,6 +104,7 @@ def main(args):
         )
 
         if not should_process:
+            print(f"FPS Ignore {i}")
             continue
 
         if not args.file:
@@ -132,7 +133,7 @@ def main(args):
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
             if str(e) == "Segement is too short":
-                print("Segement too short, continue")
+                print(f"Segement too short, continue (at {i})")
                 continue
             raise
 
